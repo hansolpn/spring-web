@@ -23,13 +23,13 @@ public class RequestController {
 	public RequestController() {
 		System.out.println("RequestCon 생성됨!");
 	}
-	
+
 	@RequestMapping("/test")
 	public String testCall() {
 		System.out.println("/request/test 요청이 들어옴!");
 		return "test";		
 	}
-	
+
 	/*
 	 만약 사용자가 /request/req 요청을 보내 왔을 때
 	 views폴더 아래 request폴더 안에 존재하는
@@ -40,34 +40,34 @@ public class RequestController {
 		System.out.println("/request/req 요청이 들어옴");
 		return "request/req-ex01";
 	}
-	
+
 	//@RequestMapping(value="/request/basic01", method = RequestMethod.GET)
 	@GetMapping("/basic01")
 	public String basicGet() {
 		System.out.println("/basic01 요청이 들어옴~!: GET방식");
 		return "request/req-ex01";
 	}
-	
-	
+
+
 	//@RequestMapping(value="/request/basic01" , method = RequestMethod.POST)
 	@PostMapping("/basic01")
 	public String basicPost() {
 		System.out.println("/basic01 요청이 들어옴~!: POST방식");
 		return "request/req-ex01";
 	}
-	
+
 	/////////////////////////////////////////
-	
+
 	// 컨트롤러 내의 메서드 타입을 void로 선언하면
 	// 요청이 들어온 URL 값을 뷰 리졸버에게 전달합니다.
 	@GetMapping("/join")
 	public void register() {
 		System.out.println("/request/join: GET");
 	}
-	
+
 	// 요청 URI 주소가 같더라도, 전송 방식에 따라 맵핑을 다르게 하기 때문에
 	// 같은 주소를 사용하는 것이 가능합니다. (GET -> 화면처리, POST -> 입력값 처리)
-	
+
 	/*
 	 스프링에서 요청과 함께 전달된 데이터를 처리하는 방식
 	 
@@ -84,7 +84,7 @@ public class RequestController {
 		System.out.println("Hobby: " + Arrays.toString(request.getParameterValues("hobby")));
 	}
 	*/
-	
+
 	/*
 	 2. @RequestParam 아노테이션을 이용한 요청 파라미터 처리.
 	 @RequestParam("파라미터 변수명") 값을 받아서 처리할 변수
@@ -101,16 +101,16 @@ public class RequestController {
 		
 	}
 	*/
-	
+
 	/*
 	 3. 커맨드 객체를 활용한 파라미터 처리
 	 - 파라미터 데이터와 연동되는 VO클래스가 필요합니다.
 	 - VO 클래스의 필드는 파라미터 변수명과 동일하게 작성합니다. (setter 메서드를 호출)
 	 
-	 # 커맨드 객체: 사용자의 입력을 담기 위해 설계되고, 특정 검증 로직이나 비지니스 로닉을
+	 # 커맨드 객체: 사용자의 입력을 담기 위해 설계되고, 특정 검증 로직이나 비지니스 로직을
 	 수행할 수 있음. (VO 보다는 역활이 좀 더 많고, 특정 목적을 가진 객체)
 	 */
-	
+
 	@PostMapping("join")
 	public void register(UserVO vo) {
 		System.out.println(vo);
