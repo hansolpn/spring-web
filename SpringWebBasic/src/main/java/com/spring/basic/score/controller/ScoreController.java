@@ -20,11 +20,11 @@ public class ScoreController {
 
 	// 만약에 클래스의 생성자가 단 1개라면
 	// 자동으로 @autowired를 작성해 줌
-
-	//	@Autowired
-	//	public ScoreController(ScoreService service) {
-	//		this.service = service;
-	//	}
+	
+//	@Autowired
+//	public ScoreController(ScoreService service) {
+//		this.service = service;
+//	}
 
 	// 1. 성적 등록 화면 띄우기 + 정보 목록 조회
 	@GetMapping("/list")
