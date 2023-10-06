@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper>
+	<resultMap type="com.spring.basic.board.repository.IBoardMapper" id="boardMap">
+		<id property="boardNo" column="board_no"/>
+		<result property="regDate" column="reg_date"/>
+	</resultMap>
+	
+	<!-- 게시글 등록 -->
+	<insert id="insertArticle">
+		INSERT INTO jdbc_board (board_no, writer, title, content)
+		VALUES(board_seq.NEXTVAL, #{writer}, #{title}, #{content})
+	</insert>
+	
+	<!-- 게시글 목록 -->
+	<select id="getArticles" resultMap="Board">
+		SELECT * FROM jdbc_board;
+	</select>
+	
+	<!-- 게시글 상세 -->
+	<select id="getArticle" resultMap="Board">
+		SELECT * FROM jdbc_board
+		WHERE board_no = #{bno};
+	</select>
+	
+	<!-- 게시글 수정 -->
+	<update id="updateArticle">
+		UPDATE jdbc_board
+		SET writer = #{writer}, title = #{title}, content = #{content},
+			reg_date = #{regDate}
+		WHERE board_no = #{boardNo};
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deleteArticle">
+		DELETE FROM jdbc_board
+		WHERE board_no = #{bno};
+	</delete>
+	
+</mapper>
