@@ -2,41 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper>
-	<resultMap type="com.spring.basic.board.repository.IBoardMapper" id="boardMap">
+<mapper namespace="com.spring.basic.board.repository.IBoardMapper">
+	<resultMap type="com.spring.basic.board.entity.Board" id="boardMap">
 		<id property="boardNo" column="board_no"/>
 		<result property="regDate" column="reg_date"/>
 	</resultMap>
 	
 	<!-- 게시글 등록 -->
 	<insert id="insertArticle">
-		INSERT INTO jdbc_board (board_no, writer, title, content)
-		VALUES(board_seq.NEXTVAL, #{writer}, #{title}, #{content})
+		INSERT INTO jdbc_board
+		VALUES(board_seq.NEXTVAL, #{writer}, #{title}, #{content}, sysdate)
 	</insert>
 	
 	<!-- 게시글 목록 -->
-	<select id="getArticles" resultMap="Board">
-		SELECT * FROM jdbc_board;
+	<select id="getArticles" resultMap="boardMap">
+		SELECT * FROM jdbc_board
+		ORDER BY board_no DESC
 	</select>
 	
 	<!-- 게시글 상세 -->
-	<select id="getArticle" resultMap="Board">
+	<select id="getArticle" resultMap="boardMap">
 		SELECT * FROM jdbc_board
-		WHERE board_no = #{bno};
+		WHERE board_no = #{bno}
 	</select>
 	
 	<!-- 게시글 수정 -->
 	<update id="updateArticle">
 		UPDATE jdbc_board
-		SET writer = #{writer}, title = #{title}, content = #{content},
-			reg_date = #{regDate}
-		WHERE board_no = #{boardNo};
+		SET writer = #{writer}, title = #{title}, content = #{content}
+		WHERE board_no = #{boardNo}
 	</update>
 	
 	<!-- 게시글 삭제 -->
 	<delete id="deleteArticle">
 		DELETE FROM jdbc_board
-		WHERE board_no = #{bno};
+		WHERE board_no = #{bno}
 	</delete>
 	
 </mapper>
