@@ -44,9 +44,8 @@ public class FreeBoardService implements IFreeBoardService {
 
 	@Override
 	public FreeContentResponseDTO getContent(int bno) {
-		FreeBoard board = mapper.getContent(bno);
-				
-		return new FreeContentResponseDTO(board);
+
+		return new FreeContentResponseDTO(mapper.getContent(bno));
 	}
 
 	@Override

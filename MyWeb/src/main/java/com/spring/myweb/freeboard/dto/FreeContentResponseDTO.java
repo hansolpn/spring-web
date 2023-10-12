@@ -16,18 +16,18 @@ public class FreeContentResponseDTO {
 
 	private int bno;
 	private String title;
-	private String content;
 	private String writer;
+	private String content;
 	private String date;
 	
 	public FreeContentResponseDTO(FreeBoard board) {
 		this.bno = board.getBno();
 		this.title = board.getTitle();
-		this.content = board.getContent();
 		this.writer = board.getWriter();
-		this.date = board.getUpdateDate() == null ?
-				makePrettierDateString(board.getRegDate())
-			  : makePrettierDateString(board.getUpdateDate()) + "(수정됨)";
+		this.content = board.getContent();
+		this.date = board.getUpdateDate() == null
+			  ? makePrettierDateString(board.getRegDate())
+			  : makePrettierDateString(board.getUpdateDate()) + " (수정됨)";
 		
 	}
 	

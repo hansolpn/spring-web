@@ -15,6 +15,7 @@ import lombok.ToString;
 public class FreeUpdateRequestDTO {
 
 	private int bno;
+	private String writer;
 	private String title;
 	private String content;
 }
