@@ -18,8 +18,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.spring.myweb.freeboard.dto.FreeContentResponseDTO;
-import com.spring.myweb.freeboard.dto.FreeListResponseDTO;
+import com.spring.myweb.freeboard.dto.response.FreeContentResponseDTO;
+import com.spring.myweb.freeboard.dto.response.FreeListResponseDTO;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/root-context.xml",

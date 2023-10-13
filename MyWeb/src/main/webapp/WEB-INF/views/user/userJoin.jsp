@@ -1,6 +1,7 @@
 ﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
+    <%@ include file="../include/header.jsp" %>
     <section>
         <div class="container">
             <div class="row">
@@ -90,13 +91,14 @@
             </div>
         </div>
     </section>
+    <%@ include file="../include/footer.jsp" %>
 
     <script>
         /*아이디 형식 검사 스크립트*/
         var id = document.getElementById("userId");
         id.onkeyup = function() {
             /*자바스크립트의 정규표현식 입니다*/
-            /*test메서드를 통해 비교하며, 매칭되면 true, 아니면 false반*/
+            /*test메서드를 통해 비교하며, 매칭되면 true, 아니면 false*/
             var regex = /^[A-Za-z0-9+]{4,12}$/; 
             if(regex.test(document.getElementById("userId").value )) {
                 document.getElementById("userId").style.borderColor = "green";
