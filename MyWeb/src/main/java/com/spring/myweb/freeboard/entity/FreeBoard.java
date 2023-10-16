@@ -10,6 +10,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Getter @Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class FreeBoard {
+
+	private int bno;
+	private String title;
+	private String writer;
+	private String content;
+	private LocalDateTime regDate;
+	private LocalDateTime updateDate;
+}
+
 /*
 CREATE TABLE freeboard (
     bno NUMBER PRIMARY KEY,
@@ -27,19 +43,3 @@ CREATE SEQUENCE freeboard_seq
     NOCYCLE
     NOCACHE;
  */
-
-@Getter @Setter
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class FreeBoard {
-
-	private int bno;
-	private String title;
-	private String writer;
-	private String content;
-	private LocalDateTime regDate;
-	private LocalDateTime updateDate;
-}
