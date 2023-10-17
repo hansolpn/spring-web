@@ -187,7 +187,22 @@
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.14.2</version>
-		</dependency>		
+		</dependency>
+		<!-- java에서 mail을 보내기 위해 필요로 하는 라이브러리-->
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>1.4.7</version>
+		</dependency>
+		
+		<!-- spring-context-support 간단한 설정을 통해 메일 라이브러리를 사용할 수 있도록 도와준다
+		 메일 뿐만 아니라 캐시메모리. 스케줄링 ui와 관련된 다양한 부가기능을 지원하는 라이브러리-->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context-support</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+			
 		      
 	</dependencies> <!-- 의존성 라이브러리 선언 끝 -->
 	
