@@ -66,8 +66,31 @@ public class UserService {
 	}
 
 	public void updateUser(UserJoinRequestDTO dto) {
+		User userOld = mapper.getInfo(dto.getUserId());
+		User userNew = User.builder()
+							.userId(dto.getUserId())
+							.userName(dto.getUserName())
+							.userEmail1(dto.getUserEmail1())
+							.userEmail2(dto.getUserEmail2())
+							.userPhone1(dto.getUserPhone1())
+							.userPhone2(dto.getUserPhone2())
+							.addrBasic(dto.getAddrBasic())
+							.addrDetail(dto.getAddrDetail())
+							.addrZipNum(dto.getAddrZipNum())
+							.build();
 		
+		if (dto.getUserPw().equals("")) {
+			System.out.println("비밀번호가 변경되지 않음");
+			userNew.setUserPw(userOld.getUserPw());
+		}
+		else {
+			System.out.println("비밀번호가 변경됨");
+			userNew.setUserPw(encoder.encode(dto.getUserPw()));
+		}
 		
+		System.out.println(userNew);
+		mapper.updateUser(userNew);	
+
 	}
 
 

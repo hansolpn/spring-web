@@ -58,7 +58,7 @@
 
                                         <c:if test="${login != null}">
                                         <li><a href="${pageContext.request.contextPath}/user/userMypage"><span class="glyphicon glyphicon-user"></span> MyPage</a></li>
-                                        <li><a href="${pageContext.request.contextPath}/"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                                        <li><a href="${pageContext.request.contextPath}/user/userLogout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                                         </c:if>
 
                                     </ul>

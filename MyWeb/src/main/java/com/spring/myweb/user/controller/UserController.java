@@ -107,9 +107,16 @@ public class UserController {
 	public String userMyPage(Model model, UserJoinRequestDTO dto) {
 		System.out.println("/userMypage(post)");
 		System.out.println(dto);
-		//service.updateUser(dto);
+		service.updateUser(dto);
 		
 		return "redirect:/user/userMypage";
+	}
+	
+	@GetMapping("/userLogout")
+	public String userLogout(HttpSession session) {
+		session.invalidate();
+		
+		return "redirect:/";
 	}
 
 }
