@@ -29,6 +29,7 @@ public class MailSenderService {
 	}
 
 	// 가입할 회원에게 전송할 이메일 양식 준비
+	@SuppressWarnings("unused")
 	public String joinEmail(String email) {
 		int authNum = makeRandomNumber(); // 인증번호 생성
 
@@ -47,6 +48,7 @@ public class MailSenderService {
 	}
 
 	// 이메일을 실제로 전송하는 메서드
+	@SuppressWarnings("unused")
 	private void mailSend(String setFrom, String toMail, String title, String content) {
 
 

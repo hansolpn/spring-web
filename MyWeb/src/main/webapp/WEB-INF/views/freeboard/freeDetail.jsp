@@ -95,7 +95,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="btn btn-default pull-right" data-dismiss="modal">닫기</button>
-					<h4 class="modal-title">댓글수정</h4>
+					<h4 class="modal-title">댓글 수정</h4>
 				</div>
 				<div class="modal-body">
 					<!-- 수정폼 id값을 확인하세요-->
@@ -249,6 +249,171 @@
                 })
             } // end getList()
 
+            //수정 삭제
+            /*
+            document.querySelector('.replyModify').onclick = (e) => {
+                e.preventDefault();
+                console.log('수정 버튼 클릭 이벤트 발생!');
+            } (이거 동작 안함!)
+
+            .replyModify요소는 실제 존재하는 요소가 아니라
+            비동기 통신을 통해 생성되는 요소입니다.
+            그러다 보니이벤트가 등록되는 시점보다 fetch 함수의 실행이 먼저 끝날 것이라는
+            보장이 없기 때문에 해당 방식은 이벤트 등록이 불가능합니다.
+            이 때는 이미 실제로 존재하는 #replyList에 이벤트를 등록하고, 이벤트를 자식에게 위임하여
+            사용하는 addEventListener를 통해 처리해야 합니다.
+            */
+           $replyList.addEventListener('click', (e) => {
+                e.preventDefault(); // 태그의 고유 기능을 중지
+
+                // 1. 이벤트가 발생한 target이 a태그가 아니라면 이벤트 강제 종료
+                if (!e.target.matches('a')) {
+                    return;
+                }
+
+                // 2. a태그가 두 개(수정, 삭제)이므로 어떤 링크인지를 확인
+                // 댓글이 여러 개 -> 수정, 삭제가 발생하는 댓글이 몇 번인지도 확인해야 한다.
+                const rno = e.target.getAttribute('href');
+                console.log('댓글 번호: ', rno);
+                // 모달 내부에 숨겨진 input태그에 댓글 번호를 달아주자
+                document.getElementById('modalRno').value = rno;
+
+                // 댓글 내용도 가져와서 모달에 뿌려주자
+                const content = e.target.parentNode.nextElementSibling.textContent;
+                console.log('댓글 내용: ', content);
+
+                // 3. 모달 창 하나를 이용해서 상황에 맞게 수정 / 삭제 모달을 제공해야 한다.
+                // 조건문을 작성 (수정 or 삭제에 따라 모달 디자인을 조정)
+                if (e.target.classList.contains('replyModify')) {
+                    // 수정 버튼을 눌렸으므로 수정 모달을 보여주겠다
+                    document.querySelector('.modal-title').textContent = '댓글 수정';
+                    document.getElementById('modalReply').style.display = 'inline';
+                    document.getElementById('modalReply').value = content;
+                    document.getElementById('modalModBtn').style.display = 'inline';
+                    document.getElementById('modalDelBtn').style.display = 'none';
+                }
+                else {
+                    document.querySelector('.modal-title').textContent = '댓글 삭제';
+                    document.getElementById('modalReply').style.display = 'none';
+                    document.getElementById('modalModBtn').style.display = 'none';
+                    document.getElementById('modalDelBtn').style.display = 'inline';
+                }
+
+                // 어쩔수 없이 제이쿼리를 이용하여 bootstrap 모달을 여는 방법.
+                $('#replyModal').modal('show');
+
+           }); // 수정 or 삭제 버튼 클릭 이벤트 끝
+
+           // 수정 처리 함수 (수정 모달을 열어서 수정 내용을 작성한 후 수정 버튼을 클릭했을 때)
+           document.getElementById('modalModBtn').onclick = () => {
+                const reply = document.getElementById('modalReply').value;
+                const rno = document.getElementById('modalRno').value;
+                const replyPw = document.getElementById('modalPw').value;
+
+                if (reply === '' || replyPw === '') {
+                    alert('내용, 비밀번호를 확인하세요!');
+                    return;
+                }
+
+                // 요청에 관련된 정보 객체
+                const reqObj = {
+                    method: 'put',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'replyText': reply,
+                        'replyPw': replyPw,
+                    }),
+                };
+
+                fetch('${pageContext.request.contextPath}/reply/' + rno, reqObj)
+                .then(res => res.text())
+                .then(data => {
+                    if (data === 'updateSuccess') {
+                        console.log('수정 성공');
+                        alert('정상 수정 되었습니다.');
+                        // 모달에 작성된 내용들을 지워주자
+                        document.getElementById('modalReply').value = '';
+                        document.getElementById('modalPw').value = '';
+
+                        //제이쿼리 문법으로 bootstrap 모달 닫아주기
+                        $('#replyModal').modal('hide');
+                        getList(1, true);
+                    }
+                    else if (data === 'pwFail') {
+                        console.log('비밀번호 틀림');
+                        alert('비밀번호를 확인하세요!');
+                        document.getElementById('modalPw').value = '';
+                        document.getElementById('modalPw').focus();
+                    }
+                    else {
+                        console.log(data);
+                    }
+                });
+           } // 수정 처리 끝
+
+           // 삭제 이벤트
+           document.getElementById('modalDelBtn').onclick = () => {
+                /*
+                1. 모달창에 rno값, replyPw 값을 얻습니다.
+
+                2. fetch 함수를 이용해서 DELETE 방식으로 reply/{rno} 요청
+
+                3. 서버에서는 요청을 받아서 비밀번호를 확인하고, 비밀번호가 맞으면
+                삭제를 진행하시면 됩니다.
+
+                4. 만약 비밀번호가 틀렸다면, 문자열을 반환해서
+                '비밀번호가 틀렸습니다.' 경고창을 띄우세요.
+
+                삭제 완료되면 모달 닫고 목록 요청 다시 보내세요. (reset의 여부를 잘 판단)
+                */
+
+               // 1
+               const rno = document.getElementById('modalRno').value;
+               const replyPw = document.getElementById('modalPw').value;
+
+               if (replyPw === '') {
+                    alert('비밀번호를 확인하세요!');
+                    return;
+                }
+
+               // 2
+               const reqObj = {
+                    method: 'delete',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'replyPw': replyPw,
+                    }),
+                };
+
+                fetch('${pageContext.request.contextPath}/reply/' + rno, reqObj)
+                .then(res => res.text())
+                .then(data => {
+                    // 4
+                    if (data === 'deleteSuccess') {
+                        alert('삭제가 정상 처리되었습니다.');
+                        document.getElementById('modalPw').value = '';
+
+                        $('#replyModal').modal('hide');
+                        getList(1, true);
+
+                    }
+                    if (data === 'pwFail') {
+                        alert('비밀번호가 틀렸습니다.');
+                        document.getElementById('modalPw').value = '';
+                        document.getElementById('modalPw').focus();
+                    }
+                    else {
+                        console.log(data);;
+                    }
+
+                });
+
+           }// 삭제 처리 끝
+
             // 댓글 날짜 변환 함수
             function parseTime(regDate) {
                 // 원하는 날짜로 객체를 생성
@@ -274,6 +439,10 @@
                 else {
                     //time = regDate;
                     time = `\${regTime.getFullYear()}년 \${regTime.getMonth() + 1}월 \${regTime.getDate()}일`;
+                }
+
+                if (regDate.includes('(수정됨)')) {
+                    time += ' (수정됨)';
                 }
 
                 return time;

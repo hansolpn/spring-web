@@ -28,4 +28,22 @@
         SELECT COUNT(*) FROM reply
         WHERE bno = #{bno}
     </select>
+
+    <select id="pwCheck" resultType="string">
+        SELECT reply_pw FROM reply
+        WHERE reply_no = #{rno}
+    </select>
+
+    <update id="update">
+        UPDATE reply
+        SET
+            reply_text = #{replyText},
+            update_date = sysdate
+        WHERE reply_no = #{replyNo}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM reply
+        WHERE reply_no = #{replyNO}
+    </delete>
 </mapper>
