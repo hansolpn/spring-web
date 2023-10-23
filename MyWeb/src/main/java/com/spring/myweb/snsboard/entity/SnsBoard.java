@@ -2,8 +2,6 @@ package com.spring.myweb.snsboard.entity;
 
 import java.time.LocalDateTime;
 
-import com.spring.myweb.freeboard.entity.FreeBoard;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,7 +20,7 @@ public class SnsBoard {
 
 	private int bno;
 	private String writer;
-	private String updatePath;
+	private String uploadPath;
 	private String fileLoca;
 	private String fileName;
 	private String fileRealName;
