@@ -354,7 +354,7 @@
 
 			// 글 목록 함수 선언
 			let str = '';
-			let page = 1;
+			let pages = 1;
 			let refresh = true;
 			const $contentDiv = document.getElementById('contentDiv');
 			getList(1, true);
@@ -364,6 +364,7 @@
 	
 				console.log('page: ', page);
 				console.log('reset: ', reset);
+				console.log('refresh: ', refresh);
 	
 				
 				fetch('${pageContext.request.contextPath}/snsboard/' + page)
@@ -371,20 +372,22 @@
 				.then(list => {
 					console.log(list);
 					console.log(list.length);
-
+				
 					if (list.length == 0) {
 						refresh = false;
+						return;
 					}
-	
+
 					if (reset) {
 						while($contentDiv.firstChild) {
 							$contentDiv.firstChild.remove();
 						}
-						
-						page = 1;
+
+						pages = 1;
 						refresh = true;
+						window.scrollTo(0,0);
 					}
-	
+
 					for (const board of list) {
 						str +=
 						`<div class="title-inner">
@@ -415,7 +418,7 @@
 							<div class="link-inner">
 								<a href="##"><i class="glyphicon glyphicon-thumbs-up"></i>좋아요</a>
 								<a data-bno="` + board.bno + `" id="comment" href="` + board.bno + `"><i class="glyphicon glyphicon-comment"></i>댓글달기</a>
-								<a id="delBtn" href="` + board.bno + `"><i class="glyphicon glyphicon-remove"></i>삭제하기</a>
+								<a id="delBtn" data-bno="` + board.bno + `" href="` + board.bno + `"><i class="glyphicon glyphicon-remove"></i>삭제하기</a>
 							</div>`;
 					}
 	
@@ -437,6 +440,7 @@
 				if (!e.target.matches('.image-inner img')
 					&& !e.target.matches('.title #download')
 					&& !e.target.matches('.link-inner #comment')
+					&& !e.target.matches('.link-inner #delBtn')
 				   ) {
 					console.log('이벤트 대상 x');
 					return;
@@ -460,23 +464,25 @@
 				//전달 받은 글 내용을 미리 준비한 모달창에 뿌릴 겁니다.(모달 위에 있어요.)
 				//값을 제 위치에 배치하시고 모달을 열어 주세요. 
 				//(부트스트랩 모달이기 때문에 jQuery로 열어주세요.)
-				$snsImg = document.getElementById('snsImg');
-				$snsWriter = document.getElementById('snsWriter');
-				$snsRegdate = document.getElementById('snsRegdate');
-				$snsContent = document.getElementById('snsContent');
-
+				const $snsImg = document.getElementById('snsImg');
+				const $snsWriter = document.getElementById('snsWriter');
+				const $snsRegdate = document.getElementById('snsRegdate');
+				const $snsContent = document.getElementById('snsContent');
+				
 				fetch('${pageContext.request.contextPath}/snsboard/content/' + bno)
 				.then(res => res.json())
 				.then(data => {
 					console.log(data);
+					const src = '${pageContext.request.contextPath}/snsboard/display/' + data.fileLoca + '/' + data.fileName;
 
 					$snsRegdate.textContent = data.regDate;
 					$snsWriter.textContent = data.writer;
 					$snsContent.textContent = data.content;
-					$snsImg.setAttribute('src', '${pageContext.request.contextPath}/snsboard/display/' + data.fileLoca + '/' + data.fileName);
+					$snsImg.setAttribute('src', src);
 
-					$('#snsModal').modal('show');
 				});
+
+				$('#snsModal').modal('show');
 
 			}
 
@@ -488,7 +494,7 @@
 				if (e.pageY >= document.body.scrollHeight * 0.8 - 250) {
 					console.log(refresh);
 					if (refresh) {
-						getList(++page, false);
+						getList(++pages, false);
 					}					
 				}
 			}
