@@ -4,14 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,10 +26,12 @@ import com.spring.myweb.snsboard.dto.SnsBoardResponseDTO;
 import com.spring.myweb.snsboard.service.SnsBoardService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/snsboard")
 @RequiredArgsConstructor
+@Slf4j
 public class SnsBoardController {
 
 	private final SnsBoardService service;
@@ -47,7 +54,8 @@ public class SnsBoardController {
 
 	@GetMapping("/{page}")
 	public List<SnsBoardResponseDTO> getList(@PathVariable int page) {
-		System.out.println("/snsboard/getList: GET!");
+		//System.out.println("/snsboard/getList: GET!");
+		log.info("/snsboard/getList: GET!");
 
 		return service.getList(page);
 
@@ -62,11 +70,11 @@ public class SnsBoardController {
 	 */
 	@GetMapping("/display/{fileLoca}/{fileName}")
 	public ResponseEntity<?> getImage(@PathVariable String fileLoca, @PathVariable String fileName) {
-		System.out.println("fileLoca: " + fileLoca);
-		System.out.println("fileName: " + fileName);
+		log.info("fileLoca: " + fileLoca);
+		log.info("fileName: {}", fileName);
 
 		File file = new File("c:/test/upload/" + fileLoca + "/" + fileName);
-		System.out.println(file.toString()); // 완성된 경로
+		log.info(file.toString()); // 완성된 경로
 
 		// 응답에 대한 여러가지 정보를 전달할 수 있는 객체 ResponseEntity
 		// 응답 내용, 응답이 성공했는지에 대한 여부, 응답에 관련된 여러 설정들을 지원합니다.
@@ -134,8 +142,26 @@ public class SnsBoardController {
 
 	@GetMapping("/content/{bno}")
 	public SnsBoardResponseDTO content(@PathVariable int bno) {
-		System.out.println("/content/" + bno + ": GET");
+		log.info("/content/" + bno + ": GET");
 		return service.getContent(bno);
+	}
+	
+	@DeleteMapping("/{bno}")
+	public String delete(@PathVariable int bno, HttpSession session) {
+		
+		String userId = (String) session.getAttribute("login");
+		log.info("/" + bno + ": DELETE");
+		log.info("userid: " + userId);
+		
+		return service.deleteContent(bno, userId);
+	}
+	
+	// 좋아요 버튼 클릭 처리
+	@PostMapping("like")
+	public String likeConfirm(@RequestBody Map<String, String> params) {
+		log.info("/like: POST, params: {}", params);
+		
+		return service.searchLike(params);
 	}
 
 }

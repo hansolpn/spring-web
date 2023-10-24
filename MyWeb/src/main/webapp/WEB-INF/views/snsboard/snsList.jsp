@@ -151,6 +151,7 @@
 			margin: 0px;
 		}
 	</style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 
 </head>
 
@@ -355,26 +356,29 @@
 			// 글 목록 함수 선언
 			let str = '';
 			let pages = 1;
-			let refresh = true;
+			let isFinish = false;
+			let isPageEnd = false;
+
 			const $contentDiv = document.getElementById('contentDiv');
+
 			getList(1, true);
 	
 			function getList(page, reset) {
 				str = '';
-	
+				isFinish = false;
+
 				console.log('page: ', page);
 				console.log('reset: ', reset);
-				console.log('refresh: ', refresh);
-	
-				
+
 				fetch('${pageContext.request.contextPath}/snsboard/' + page)
 				.then(res => res.json())
 				.then(list => {
 					console.log(list);
 					console.log(list.length);
-				
-					if (list.length == 0) {
-						refresh = false;
+
+					if (list.length <= 0) {
+						isFinish = true;
+						isPageEnd = true;
 						return;
 					}
 
@@ -384,8 +388,6 @@
 						}
 
 						pages = 1;
-						refresh = true;
-						window.scrollTo(0,0);
 					}
 
 					for (const board of list) {
@@ -416,7 +418,7 @@
 								<img src="${pageContext.request.contextPath}/img/icon.jpg"> <span>0</span>
 							</div>
 							<div class="link-inner">
-								<a href="##"><i class="glyphicon glyphicon-thumbs-up"></i>좋아요</a>
+								<a id="likeBtn" href="` + board.bno + `"><img src="${pageContext.request.contextPath}/img/like1.png" width="20px" height="20px" />&nbsp;좋아요</a>
 								<a data-bno="` + board.bno + `" id="comment" href="` + board.bno + `"><i class="glyphicon glyphicon-comment"></i>댓글달기</a>
 								<a id="delBtn" data-bno="` + board.bno + `" href="` + board.bno + `"><i class="glyphicon glyphicon-remove"></i>삭제하기</a>
 							</div>`;
@@ -428,6 +430,8 @@
 					else {
 						$contentDiv.insertAdjacentHTML('afterbegin', str);
 					}
+
+					isFinish = true;
 				
 				}); //end fetch
 	
@@ -450,6 +454,52 @@
 				if (e.target.matches('.title #download')) {
 					if (confirm('다운로드를 진행할게요.')) {
 						location.href = e.target.getAttribute('href');
+					}
+
+					return;
+				}
+				
+				// 삭제 처리
+				if (e.target.matches('.link-inner #delBtn')) {
+					//삭제하기 링크를 클릭했을 때 이벤트를 발생 시켜서
+					//비동기 방식으로 삭제를 진행해 주세요. (삭제 버튼은 여러 개 입니다!)
+					//서버쪽에서 권한을 확인 해 주세요. (작성자와 로그인 중인 사용자의 id를 비교해서 일치하는지의 여부)
+					//일치하지 않는다면 문자열 "noAuth" 리턴, 삭제 완료하면 "success" 리턴
+					//url: /snsboard/글번호 method: DELETE
+					console.log('삭제');
+					const userId = '${sessionScope.login}';
+					//const userId = 'test';
+
+					if (userId === '') {
+						alert('로그인이 필요한 서비스 입니다.');
+						return;
+					}
+
+					if (confirm('삭제하시겠습니까?')) {
+						fetch('${pageContext.request.contextPath}/snsboard/' + bno, {
+							method: "delete",
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: userId,						
+						})
+						.then(res => res.text())
+						.then(data => {
+							if (data == 'success') {
+								alert('삭제 성공!');
+							}
+							else if (data == 'noAuth') {
+								alert('권한이 없습니다.');
+							}
+							else if (data == 'fail') {
+								alert('관리자에게 문의하세요.');
+							}
+							else {
+								console.log(data);
+							}
+
+							getList(1, true); // 삭제가 반영된 새로운 글 목록 보여주기
+						}); // end fetch
 					}
 
 					return;
@@ -486,18 +536,79 @@
 
 			}
 
-			// 스크롤 페이지
-			document.body.onmousewheel = (e) => {
-				console.log(e.pageY);
-				console.log(document.body.scrollHeight * 0.8 - 250);
+			/*
+			쓰로틀링 - 일정한 간격으로 함수를 실행.
+			쓰로틀링은 사용자가 이벤트를 몇번이나 발생시키든, 일정한 간격으로
+			한 번만 실행하도록 하는 기법.
+			마우스 움직임, 스크롤 이벤트 같은 짧은 주기로 자주 발생하는 경우에 사용하는 기법 (lodash 라이브러리를 이용해 구현)
+			*/
+			const handleScroll = _.throttle(() => {
+				console.log('throttle activate!');
+				const scrollPosition = window.pageYOffset;
+				const height = document.body.offsetHeight;
+				const windowHeight = window.innerHeight;
+				//console.log(scrollPosition, height, windowHeight);
 
-				if (e.pageY >= document.body.scrollHeight * 0.8 - 250) {
-					console.log(refresh);
-					if (refresh) {
+				if (isFinish) {
+					//console.log(isFinish);
+					if (scrollPosition + windowHeight >= height * 0.9) {
+						console.log('next page call!');
 						getList(++pages, false);
-					}					
+					}
 				}
-			}
+
+			}, 1000);
+
+			// 브라우저 창에서 스크롤이 발생할 때마다 이벤트 발생
+			window.addEventListener('scroll', () => {
+				if (!isPageEnd) {
+					handleScroll();
+				}
+			});
+
+			//좋아요 기능 구현
+			$contentDiv.addEventListener('click', (e) => {
+				e.preventDefault();
+				if (!e.target.matches('#likeBtn')) {
+					return;
+				}
+				console.log('좋아요 버튼이 클릭됨');
+
+				const id = '${login}'; // 현재 로그인 중인 사용자의 아이디
+				if (id === '') {
+					alert('로그인이 필요합니다.');
+					return;
+				}
+
+				const bno = e.target.getAttribute('href'); // 좋아요를 누른 글 번호
+
+				fetch('${pageContext.request.contextPath}/snsboard/like', {
+					method: 'post',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						'userId': id,
+						'bno': bno
+					})
+				})
+				.then(res => res.text())
+				.then(result => {
+					console.log('result: ', result);
+
+					if (result === 'like') {
+						e.target.firstElementChild.setAttribute('src', '${pageContext.request.contextPath}/img/like2.png');
+						e.target.style.color = 'blue';
+						const $cnt = e.target.parentNode.previousElementSibling.children[1];
+						$cnt.textContent = Number($cnt.textContent) + 1;
+					} else {
+						e.target.firstElementChild.setAttribute('src', '${pageContext.request.contextPath}/img/like1.png');
+						e.target.style.color = 'black';
+						const $cnt = e.target.parentNode.previousElementSibling.children[1];
+						$cnt.textContent = Number($cnt.textContent) - 1;
+					}
+				}); // end fetch
+			});
 	
 			//자바 스크립트 파일 미리보기 기능
 			function readURL(input) {

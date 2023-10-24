@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -92,6 +93,52 @@ public class SnsBoardService {
 		SnsBoard board = mapper.getDetail(bno);
 		
 		return new SnsBoardResponseDTO(board);
+		
+	}
+
+	public String deleteContent(int bno, String userId) {
+		SnsBoard board = mapper.getDetail(bno);
+		
+		if (board.getWriter().equals(userId)) {
+			mapper.delete(bno);
+			
+			// 글이 삭제되었다면 더이상 이미지도 존재할 필요가 없으므로
+			// 이미지도 함께 삭제해 주셔야 합니다.
+			// File 객체 생성 -> 생성자에 삭제하고자 하는 파일의 경로 지정
+			// 메서드 delete() -> return type이 boolean 삭제 성공시 true, 실패시 false
+			File file = new File(board.getUploadPath() + "/" + board.getFileLoca() + "/" + board.getFileName());
+			boolean res = true;
+			
+			if (file.exists()) {
+				res = file.delete();
+				System.out.println("파일 이름: " + file);
+				System.out.println("파일 삭제: " + res);
+			}
+			
+			if (res) {
+				return "success";
+			}
+			else {
+				return "fail";
+			}
+		}
+		else {
+			return "noAuth";
+		}
+		
+	}
+
+	public String searchLike(Map<String, String> params) {
+		if (mapper.searchLike(params) == 0) {
+			// 좋아요를 처음 눌렸다.
+			mapper.createLike(params);
+			return "like";
+		}
+		else {
+			// 이미 누른 좋아요를 취소하고 싶다.
+			mapper.deleteLike(params);
+			return "delete";
+		}
 		
 	}
 	
