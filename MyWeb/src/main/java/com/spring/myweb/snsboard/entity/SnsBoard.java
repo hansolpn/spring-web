@@ -26,6 +26,8 @@ public class SnsBoard {
 	private String fileRealName;
 	private String content;
 	private LocalDateTime regDate;
+	// 좋아요 개수가 몇개인지를 알려주는 변수 선언
+	private int likeCnt;
 }
 
 /*

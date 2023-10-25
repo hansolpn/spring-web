@@ -20,6 +20,7 @@ public class SnsBoardResponseDTO {
 	private String fileName;
 	private String content;
 	private String regDate;
+	private int likeCnt;
 	
 	public SnsBoardResponseDTO(SnsBoard board) {
 		bno = board.getBno();
@@ -28,6 +29,7 @@ public class SnsBoardResponseDTO {
 		fileName = board.getFileName();
 		content = board.getContent();
 		regDate = makePrettierDateString(board.getRegDate());
+		likeCnt = board.getLikeCnt();
 		
 	}
 	

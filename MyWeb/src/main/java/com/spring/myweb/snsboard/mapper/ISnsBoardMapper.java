@@ -23,9 +23,12 @@ public interface ISnsBoardMapper {
 	// 좋아요 탐색
 	int searchLike(Map<String, String> params);
 	
-	//좋아요 등록
+	// 좋아요 등록
 	void createLike(Map<String, String> params);
 	
-	//좋아요 삭제
+	// 좋아요 삭제
 	void deleteLike(Map<String, String> params);
+
+	// 특정 회원의 좋아요 글 번호 목록
+	List<Integer> likeList(String userId);
 }
