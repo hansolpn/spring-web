@@ -232,6 +232,13 @@
 		    <artifactId>commons-io</artifactId>
 		    <version>2.14.0</version>
 		</dependency>
+
+		<!-- json-simple: 문자열 데이터를 JSON으로 변환해 주는 라이브러리 -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 		      
 	</dependencies> <!-- 의존성 라이브러리 선언 끝 -->
 	
