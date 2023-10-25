@@ -485,6 +485,10 @@
 				// a 태그의 고유 기능 막기
 				e.preventDefault();
 
+				// 글 번호 얻기
+				const bno = e.target.dataset.bno;
+				console.log('bno: ', bno);
+
 				if (!e.target.matches('.image-inner img')
 					&& !e.target.matches('.title #download')
 					&& !e.target.matches('.link-inner #comment')
@@ -548,10 +552,6 @@
 
 					return;
 				}
-
-				// 글 번호 얻기
-				const bno = e.target.dataset.bno;
-				console.log('bno: ', bno);
 
 				//fetch함수를 사용하여 글 상세 보기 요청을 비동기 식으로 요청하세요.
 				// url: /snsboard/content/글번호 -> GET
