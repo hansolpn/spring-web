@@ -16,3 +16,20 @@
     </select>
 
 </mapper>
+
+<!-- 
+SELECT t.*,
+    (SELECT ABS(t.latitude - 37.5621181) + ABS(t.longitude - 126.9428028) FROM dual) AS diff
+FROM
+    (
+    SELECT * FROM test_location
+    ORDER BY ABS(latitude - 37.5621181) + ABS(longitude - 126.9428028)
+    ) t
+WHERE ROWNUM < 11;
+SELECT * FROM
+    (
+    SELECT * FROM test_location
+    ORDER BY ABS(latitude - 37.5621181) + ABS(longitude - 126.9428028)
+    )
+WHERE ROWNUM = 1;
+-->
