@@ -1,5 +1,7 @@
 package com.spring.myweb.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -42,12 +45,8 @@ public class WeatherService {
 		String resStr = "";
 		
 		// RestTemplate을 이용하여 api 요청을 해 보자
-		
-		// 요청 헤더 설정 (api에서 원하는 헤더 설정이 있다면 사용하세요.)
-		HttpHeaders headers = new HttpHeaders();
-		//headers.set("Content-type", "application/json;");
-		
-		// 요청 파라미터 설정
+
+		// 요청 파라미터 설정 -> POST, DELETE, PATCH
 //		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 //		params.add("serviceKey", serviceKey);
 //		params.add("pageNo", "1");
@@ -58,7 +57,13 @@ public class WeatherService {
 //		params.add("nx", String.valueOf(map.get("NX")));
 //		params.add("ny", String.valueOf(map.get("NY")));
 		
-		UriComponents uri = UriComponentsBuilder.fromHttpUrl(reqUrl)
+        // 요청 헤더 설정(api에서 원하는 헤더 설정이 있다면 사용하세요.)
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Accept", "*/*;q=0.9"); // HTTP_ERROR 방지
+		
+		//GET 방식의 요청에서 url에 쿼리파라미터를 묻혀서 보내는 방법
+		UriComponents builder = UriComponentsBuilder.fromHttpUrl(reqUrl)
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("pageNo", "1")
                 .queryParam("numOfRows", "10")
@@ -67,15 +72,17 @@ public class WeatherService {
 				.queryParam("base_time", "0200")
 				.queryParam("nx", String.valueOf(map.get("NX")))
 				.queryParam("ny", String.valueOf(map.get("NY")))
-				.build(false);
+				.build();
 		
-		log.info("url: {}", uri.toString());
+		log.info("url: {}", builder.toUriString());
 		
 		// REST 방식의 통신을 보내줄 객체 생성
 		RestTemplate template = new RestTemplate();
 		
 		// 위에서 세팅한 header 정보와 parameter를 하나의 엔티티로 포장
-		//HttpEntity<Object> requestEntity = new HttpEntity<>(params, headers);
+		// HttpEntity<Object> requestEntity = new HttpEntity<>(params, headers);
+		// GET방식의 경우에는 HttpEntity에 데이터를 포함시키지 않아도 됨 -> url에 묻어 있으니까
+		// POST 등의 방식에서는 MultiValueMap을 HttpEntity에 담으면 됨
 		HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 		
 		//통신을 보내면서 응답데이터를 바로 리턴.
@@ -83,12 +90,22 @@ public class WeatherService {
         //param2: 요청 방식(method)
         //param3: 헤더와 요청파라미터 정보 엔티티 객체
         //param4: 응답 데이터를 받을 객체의 타입 (ex: dto, String, map...)
-		ResponseEntity<Map> responseEntity = template.exchange(uri.toString(), HttpMethod.GET, requestEntity, Map.class);
-		
-		// 응답데이터에서 필요한 정보를 가져오자
-		Map<String, Object> responseData = (Map<String, Object>) responseEntity.getBody();
-		
-		log.info("요청에 따른 응답 데이터: {}", responseData);
+		Map<String, Object> responseData = null;
+		try {
+			//UriComponents 타입의 값을 URI 객체로 변환. (GET)
+			URI uri = new URI(builder.toUriString());
+			ResponseEntity<Map> responseEntity = template.exchange(uri, HttpMethod.GET, requestEntity, Map.class);
+			
+			// 응답데이터에서 필요한 정보를 가져오자
+			responseData = (Map<String, Object>) responseEntity.getBody();
+			
+			log.info("요청에 따른 응답 데이터: {}", responseData);
+			log.info("body까지 접근: {}", ((Map<String, Object>) responseData.get("response")).get("body"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		
 		
 		// api에서 제공하는 예제 코드를 그대로 활용한 방식
